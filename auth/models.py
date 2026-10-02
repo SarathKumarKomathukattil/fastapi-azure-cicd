@@ -1,4 +1,4 @@
-from .auth_database import Base
+from auth.auth_database import Base
 from sqlalchemy import Column, Integer, String
 
 
