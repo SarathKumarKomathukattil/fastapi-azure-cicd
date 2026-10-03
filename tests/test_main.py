@@ -26,6 +26,8 @@ def test_create_student():
     assert response.status_code == 200
     assert response.json() == {"name": "sarath", "age": 25, "roll": 28}
 
+    
+
 
 
 
