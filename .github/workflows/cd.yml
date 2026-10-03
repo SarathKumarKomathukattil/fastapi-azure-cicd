@@ -13,6 +13,8 @@ env:
   REGISTRY_NAME: sarathfastapiacr
   REGISTRY_URL: sarathfastapiacr-f4cafqgcfve4f7cw.azurecr.io
   IMAGE_NAME: fastapi-app
+  RESOURCE_GROUP: rg-fastapi-cicd
+  CONTAINER_APP_NAME: fastapi-app
 
 jobs:
   deploy:
@@ -43,3 +45,5 @@ jobs:
       - name: Push Docker image
         run: docker push ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }}
 
+      - name: Deploy to Container App
+        run: az containerapp update --name ${{ env.CONTAINER_APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --image ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }}
