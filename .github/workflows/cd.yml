@@ -1,0 +1,45 @@
+name: FastAPI CD
+
+on:
+  workflow_run:
+    workflows: ["FastAPI CI"]
+    types: ["completed"]
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  REGISTRY_NAME: sarathfastapiacr
+  REGISTRY_URL: sarathfastapiacr-f4cafqgcfve4f7cw.azurecr.io
+  IMAGE_NAME: fastapi-app
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    if: github.event.workflow_run.conclusion == 'success' && 
+        github.event.workflow_run.head_branch == 'main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Login to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to ACR
+        run: az acr login --name ${{ env.REGISTRY_NAME }}
+
+      - name: Build Docker image
+        run: docker build -t ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }} .
+
+      - name: Push Docker image
+        run: docker push ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }}
+
