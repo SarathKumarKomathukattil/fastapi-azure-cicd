@@ -1090,4 +1090,4 @@ The project demonstrates how **application development, DevOps, cloud infrastruc
 
 **Sarath Kumar Komathukattil**
 
-AI/ML | Applied AI | MLOps | Cloud | Robotics
+AI/ML | Applied AI | MLOps | Cloud 
