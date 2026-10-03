@@ -1,14 +1,18 @@
 # FastAPI CI/CD Deployment on Azure
 
-A production-style FastAPI application demonstrating automated testing, Docker containerization, secure GitHub Actions CI/CD, Azure Container Registry, and cloud deployment using Azure Container Apps.
+A production-style FastAPI application demonstrating **automated testing, Docker containerization, secure GitHub Actions CI/CD, Azure Container Registry, and deployment to Azure Container Apps**.
 
-The primary goal of this project is to demonstrate how an application moves from **source code to a live cloud deployment through an automated CI/CD pipeline**.
+The primary goal of this project is to demonstrate how an application moves from:
+
+**Source Code → Automated Testing → Containerization → Secure Cloud Deployment → Live API**
+
+The project emphasizes **CI/CD automation, container deployment, cloud security, identity management, and production-style Azure workflows**.
 
 ---
 
 ## 🚀 Project Overview
 
-This project started as a FastAPI application and was progressively converted into a containerized, tested, and cloud-deployed service.
+This project started as a FastAPI application and was progressively converted into a tested, containerized, and cloud-deployed service.
 
 The final solution includes:
 
@@ -18,102 +22,55 @@ The final solution includes:
 - Git and GitHub
 - GitHub Actions Continuous Integration
 - GitHub Actions Continuous Deployment
-- Azure authentication using OpenID Connect (OIDC)
+- Microsoft Azure
 - Azure Container Registry (ACR)
 - Azure Container Apps
-- Managed Identity for secure ACR access
+- OpenID Connect (OIDC)
+- Microsoft Entra ID
+- Federated Identity Credentials
+- System-Assigned Managed Identity
 - Azure RBAC
-- Git commit SHA-based Docker image versioning
-- Public HTTPS endpoint
+- Git SHA-based Docker image versioning
+- Container App revisions
+- Public HTTPS API
 - FastAPI Swagger documentation
 
-The key focus of this project is **automation, secure cloud authentication, container deployment, and CI/CD**.
-
 ---
 
-# 🔄 End-to-End Workflow
+# 🔄 End-to-End CI/CD Architecture
 
-```text
-Developer changes code
-        ↓
-Git Push
-        ↓
-GitHub Repository
-        ↓
-GitHub Actions CI
-        ↓
-Install dependencies
-        ↓
-Run Pytest
-        ↓
-Build Docker image
-        ↓
-CI succeeds
-        ↓
-GitHub Actions CD
-        ↓
-Authenticate GitHub → Azure using OIDC
-        ↓
-Build versioned Docker image
-        ↓
-Push image to Azure Container Registry
-        ↓
-Update Azure Container App
-        ↓
-Azure creates a new revision
-        ↓
-FastAPI application is live
-```
-
----
-
-# 🏗️ Architecture
-
-> Add the main CI/CD workflow infographic here.
-
-```markdown
 ![CI/CD Architecture](docs/images/cicd-architecture.png)
-```
 
-Recommended infographic title:
-
-**Automated FastAPI CI/CD Pipeline on Azure**
-
-The diagram should show:
+The automated application delivery flow is:
 
 ```text
-Developer / VS Code
-        ↓
-GitHub
-        ↓
-┌─────────────────────────────┐
-│ GitHub Actions - CI         │
-│                             │
-│ Checkout                    │
-│ Install dependencies        │
-│ Pytest                      │
-│ Docker Build                │
-└──────────────┬──────────────┘
-               │
-          CI Successful
-               ↓
-┌─────────────────────────────┐
-│ GitHub Actions - CD         │
-│                             │
-│ OIDC Authentication         │
-│ Docker Build                │
-│ Docker Push                 │
-│ Container App Update        │
-└──────────────┬──────────────┘
-               │
-               ▼
-      Azure Container Registry
-               │
-               ▼
-       Azure Container Apps
-               │
-               ▼
-        FastAPI / Swagger
+Developer
+   ↓
+Git Push
+   ↓
+GitHub Repository
+   ↓
+GitHub Actions CI
+   ↓
+Pytest
+   ↓
+Docker Build Verification
+   ↓
+CI Success
+   ↓
+GitHub Actions CD
+   ↓
+OIDC Authentication
+   ↓
+Docker Build
+   ↓
+Push to Azure Container Registry
+   ↓
+Update Azure Container App
+   ↓
+New Container App Revision
+   ↓
+Live FastAPI Application
 ```
 
 ---
@@ -136,8 +93,8 @@ GitHub
 | Cloud Platform | Microsoft Azure |
 | Container Registry | Azure Container Registry |
 | Application Hosting | Azure Container Apps |
-| GitHub → Azure Authentication | OpenID Connect (OIDC) |
-| Container App → ACR Authentication | Managed Identity |
+| Deployment Authentication | OpenID Connect |
+| Runtime Authentication | Managed Identity |
 | Authorization | Azure RBAC |
 
 ---
@@ -155,6 +112,17 @@ fastapi_tutorial/
 ├── auth/
 ├── tests/
 │
+├── docs/
+│   └── images/
+│       ├── cicd-architecture.png
+│       ├── security-architecture.png
+│       ├── image-lifecycle.png
+│       ├── azure-runtime-architecture.png
+│       ├── github-actions-success.png
+│       ├── acr-images.png
+│       ├── container-app-running.png
+│       └── swagger-cloud.png
+│
 ├── main.py
 ├── crud.py
 ├── database.py
@@ -164,12 +132,11 @@ fastapi_tutorial/
 │
 ├── Dockerfile
 ├── requirements.txt
-├── .env
 ├── .gitignore
 └── README.md
 ```
 
-Sensitive environment variables are excluded from Git using `.gitignore`.
+Sensitive values such as database credentials and application secrets are stored locally in `.env` and excluded from Git.
 
 ---
 
@@ -185,34 +152,28 @@ The application demonstrates common REST API development concepts including:
 - Query parameters
 - JSON request bodies
 - Pydantic validation
-- Exception handling
 - HTTP status codes
+- Exception handling
 - SQLAlchemy integration
-- MySQL database connectivity
+- MySQL connectivity
 - User authentication
 - JWT authorization
 
-FastAPI automatically generates Swagger documentation at:
+FastAPI automatically provides interactive API documentation at:
 
 ```text
 /docs
-```
-
-Example:
-
-```text
-https://<container-app-domain>/docs
 ```
 
 ---
 
 # 🧪 Automated Testing with Pytest
 
-Automated tests were added before implementing CI/CD.
+Automated tests are executed before deployment.
 
-Testing concepts used in the project include:
+Testing concepts used include:
 
-- Basic assertions
+- Assertions
 - `pytest.raises()`
 - Parameterized tests
 - Fixtures
@@ -220,7 +181,7 @@ Testing concepts used in the project include:
 - `conftest.py`
 - FastAPI `TestClient`
 - Monkeypatching
-- Test coverage
+- Coverage
 
 Example:
 
@@ -241,7 +202,7 @@ Run tests locally:
 python -m pytest
 ```
 
-Run tests with coverage:
+Run with coverage:
 
 ```bash
 python -m pytest --cov=app --cov-report=term-missing
@@ -251,9 +212,7 @@ python -m pytest --cov=app --cov-report=term-missing
 
 # 🐳 Docker Containerization
 
-The FastAPI application is packaged into a Docker image.
-
-Dockerfile:
+The FastAPI application is packaged as a Docker image.
 
 ```dockerfile
 FROM python:3.13-slim
@@ -274,7 +233,6 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 The application runs inside the container using:
 
 ```text
-Uvicorn
 Host: 0.0.0.0
 Port: 8000
 ```
@@ -301,23 +259,23 @@ http://localhost:8000/docs
 
 # ✅ Continuous Integration
 
-The CI workflow automatically validates the application whenever code is pushed or a pull request is created.
+The CI workflow runs automatically when code is pushed or a pull request is created.
 
-CI performs:
+The CI pipeline performs:
 
 ```text
-Checkout repository
-        ↓
-Set up Python
-        ↓
-Install dependencies
-        ↓
+Checkout Code
+      ↓
+Setup Python
+      ↓
+Install Dependencies
+      ↓
 Run Pytest
-        ↓
-Build Docker image
+      ↓
+Build Docker Image
 ```
 
-Example CI workflow:
+Current CI workflow:
 
 ```yaml
 name: FastAPI CI
@@ -350,7 +308,6 @@ jobs:
 
   build:
     needs: test
-
     runs-on: ubuntu-latest
 
     steps:
@@ -361,7 +318,7 @@ jobs:
         run: docker build -t fastapi-app .
 ```
 
-The Docker build depends on:
+The Docker build only runs after testing succeeds:
 
 ```yaml
 needs: test
@@ -370,50 +327,128 @@ needs: test
 Therefore:
 
 ```text
-Tests fail ❌
-→ Docker build does not continue
+Tests fail
+   ↓
+Pipeline stops
 
-Tests pass ✅
-→ Docker build runs
+Tests pass
+   ↓
+Docker build proceeds
 ```
 
-This prevents broken application code from progressing further through the pipeline.
+This prevents broken code from progressing to deployment.
 
 ---
 
 # 🚀 Continuous Deployment
 
-The Continuous Deployment workflow starts after the CI workflow finishes successfully.
+The CD workflow starts only after the CI workflow completes successfully.
+
+It also verifies that the successful CI run came from a push to the `main` branch.
+
+The deployment sequence is:
 
 ```text
-CI succeeds
-      ↓
-CD starts
-      ↓
-Checkout tested commit
-      ↓
-Authenticate to Azure
-      ↓
+CI Success
+    ↓
+Checkout Tested Commit
+    ↓
+OIDC Login to Azure
+    ↓
 Login to ACR
-      ↓
-Build Docker image
-      ↓
-Push image to ACR
-      ↓
+    ↓
+Build Versioned Docker Image
+    ↓
+Push Image to ACR
+    ↓
 Update Azure Container App
-      ↓
-Create new revision
+    ↓
+Create New Revision
+```
+
+Current CD workflow:
+
+```yaml
+name: FastAPI CD
+
+on:
+  workflow_run:
+    workflows: ["FastAPI CI"]
+    types: ["completed"]
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  REGISTRY_NAME: sarathfastapiacr
+  REGISTRY_URL: sarathfastapiacr-f4cafqgcfve4f7cw.azurecr.io
+  IMAGE_NAME: fastapi-app
+  RESOURCE_GROUP: rg-fastapi-cicd
+  CONTAINER_APP_NAME: fastapi-app
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Login to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to ACR
+        run: az acr login --name ${{ env.REGISTRY_NAME }}
+
+      - name: Build Docker image
+        run: docker build -t ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }} .
+
+      - name: Push Docker image
+        run: docker push ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }}
+
+      - name: Deploy to Container App
+        run: az containerapp update --name ${{ env.CONTAINER_APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --image ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }}
 ```
 
 ---
 
-# 🔐 GitHub → Azure Authentication using OIDC
+# 🔐 Security Architecture
+
+![Security Architecture](docs/images/security-architecture.png)
+
+The project uses separate identities for **deployment** and **runtime access**.
+
+## GitHub → Azure
 
 GitHub Actions authenticates to Azure using **OpenID Connect (OIDC)**.
 
-This avoids storing a long-lived Azure client secret inside GitHub.
+```text
+GitHub Actions
+      ↓
+OIDC Token
+      ↓
+Microsoft Entra ID
+      ↓
+Federated Identity Credential
+      ↓
+Azure App Registration
+      ↓
+Azure Resources
+```
 
-GitHub Actions requests permission to generate an OIDC token:
+The workflow requires:
 
 ```yaml
 permissions:
@@ -421,7 +456,7 @@ permissions:
   id-token: write
 ```
 
-Azure authentication:
+Azure login:
 
 ```yaml
 - name: Login to Azure
@@ -432,7 +467,7 @@ Azure authentication:
     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 ```
 
-The following values are stored securely in GitHub repository secrets:
+The repository stores only references to:
 
 ```text
 AZURE_CLIENT_ID
@@ -440,75 +475,68 @@ AZURE_TENANT_ID
 AZURE_SUBSCRIPTION_ID
 ```
 
-No Azure client password is required.
-
-The authentication flow is:
-
-```text
-GitHub Actions
-       ↓
-Temporary OIDC token
-       ↓
-Microsoft Entra ID
-       ↓
-Federated Identity Credential
-       ↓
-Azure identity
-       ↓
-Azure resources
-```
+No Azure client password is stored in the workflow.
 
 ---
 
-# 🔒 Secretless Authentication Architecture
+# 🔑 Container App → ACR Authentication
 
-> Recommended second infographic.
-
-```markdown
-![Security Architecture](docs/images/security-architecture.png)
-```
-
-Suggested diagram:
+The Azure Container App uses a **System-Assigned Managed Identity** to retrieve the private Docker image from Azure Container Registry.
 
 ```text
-DEPLOYMENT IDENTITY
-
-GitHub Actions
-      │
-      │ OIDC
-      ▼
-Microsoft Entra ID
-      │
-      │ Federated Credential
-      ▼
-github-fastapi-cd
-      │
-      ├───────────────→ ACR
-      │
-      └───────────────→ Container Apps
-
-
-RUNTIME IDENTITY
-
 Azure Container App
-      │
-      │ System-Assigned Managed Identity
-      ▼
+        ↓
+System-Assigned Managed Identity
+        ↓
+Azure RBAC
+        ↓
 Azure Container Registry
-      │
-      ▼
+        ↓
 Pull Docker Image
 ```
 
-This project therefore uses different identities for different responsibilities.
+The Container App identity receives:
 
 ```text
-GitHub identity
-→ Push / deploy
-
-Container App identity
-→ Pull / run
+Container Registry Repository Reader
 ```
+
+This avoids storing an ACR username or password inside the application.
+
+The ACR Admin account remains disabled.
+
+---
+
+# 🛡️ Azure RBAC
+
+Different identities receive different permissions.
+
+## GitHub Deployment Identity
+
+The GitHub deployment identity needs permissions to:
+
+```text
+Push Docker images to ACR
+Update Azure Container Apps
+```
+
+For the ABAC-enabled registry, image publishing uses:
+
+```text
+Container Registry Repository Writer
+```
+
+The deployment identity also receives the Azure permissions required to update the Container App.
+
+## Container App Runtime Identity
+
+The FastAPI Container App only requires permission to retrieve images:
+
+```text
+Container Registry Repository Reader
+```
+
+This separates deployment and runtime responsibilities and follows the principle of least privilege.
 
 ---
 
@@ -516,26 +544,22 @@ Container App identity
 
 Docker images are stored inside a private Azure Container Registry.
 
-Registry:
-
 ```text
+Registry:
 sarathfastapiacr
-```
 
 Repository:
-
-```text
 fastapi-app
 ```
 
-During manual testing, Docker images were created using version tags:
+Manual deployment testing created versioned images such as:
 
 ```text
 fastapi-app:v1
 fastapi-app:v2
 ```
 
-The automated CD pipeline uses **Git commit SHAs** instead.
+Automated CD deployments use Git commit SHAs instead.
 
 Example:
 
@@ -545,321 +569,53 @@ fastapi-app:32a166d9...
 
 ---
 
-# 🏷️ Docker Image Versioning
-
-The CD pipeline does not depend on:
-
-```text
-latest
-```
-
-Instead, each Docker image is tagged using the Git commit SHA.
-
-Example:
-
-```yaml
-${{ github.event.workflow_run.head_sha }}
-```
-
-Suppose the commit is:
-
-```text
-32a166d9
-```
-
-The generated image becomes:
-
-```text
-sarathfastapiacr.azurecr.io/fastapi-app:32a166d9
-```
-
-This provides:
-
-- Traceability
-- Reproducibility
-- Easier debugging
-- Deployment history
-- Safer rollback
-- Direct mapping between source code and deployed image
-
----
-
 # 🔄 Traceable Image Lifecycle
 
-> Recommended third infographic.
-
-```markdown
 ![Image Lifecycle](docs/images/image-lifecycle.png)
-```
 
-Suggested process diagram:
+Each automated deployment uses the Git commit SHA as the Docker image tag.
 
 ```text
 Git Commit
 32a166d9
-      ↓
+     ↓
 Docker Build
-      ↓
+     ↓
 fastapi-app:32a166d9
-      ↓
+     ↓
 Azure Container Registry
-      ↓
+     ↓
 Azure Container App
-      ↓
+     ↓
 New Revision
-      ↓
-Production API
 ```
 
-Main concept:
+The core idea is:
 
 ```text
-Git SHA
+Git Commit SHA
 =
 Docker Image Tag
 =
 Deployment Version
 ```
 
----
+This improves:
 
-# ☁️ Azure Container Apps
-
-Azure Container Apps is used to run the Dockerized FastAPI application.
-
-Azure Container Registry stores the image.
-
-Azure Container Apps runs the image.
-
-```text
-Docker Image
-      ↓
-Azure Container Registry
-      ↓
-Azure Container Apps
-      ↓
-Uvicorn :8000
-      ↓
-HTTPS endpoint
-```
-
-Container Apps provides:
-
-- Container hosting
-- Managed HTTPS
-- Autoscaling
-- Scale-to-zero
-- Revision management
-- Traffic management
-- Logging
-- Application URLs
-
-The FastAPI container listens on:
-
-```text
-8000
-```
-
-Therefore Azure Container Apps ingress is configured with:
-
-```text
-Target Port: 8000
-```
-
----
-
-# 🔑 Managed Identity for Private ACR
-
-The Container App does not use an ACR username or password.
-
-Instead, a **System-Assigned Managed Identity** is enabled on the Container App.
-
-The identity receives:
-
-```text
-Container Registry Repository Reader
-```
-
-permission on the Azure Container Registry.
-
-Runtime authentication:
-
-```text
-Azure Container App
-       ↓
-System-Assigned Managed Identity
-       ↓
-Azure RBAC
-       ↓
-Azure Container Registry
-       ↓
-Pull Docker Image
-```
-
-This allows the application to securely retrieve private container images without storing registry credentials.
-
----
-
-# 🛡️ Azure RBAC
-
-The project uses different Azure permissions depending on the responsibility.
-
-### GitHub Deployment Identity
-
-The GitHub Azure identity requires permissions to:
-
-```text
-Push images to ACR
-Update Azure Container Apps
-```
-
-For the ABAC-enabled Azure Container Registry, image publishing uses:
-
-```text
-Container Registry Repository Writer
-```
-
-The deployment identity also requires access to update the Container App.
-
----
-
-### Container App Runtime Identity
-
-The FastAPI Container App requires only image pull access.
-
-It receives:
-
-```text
-Container Registry Repository Reader
-```
-
-This follows the principle of least privilege.
-
----
-
-# 🤖 Automated Deployment to Container Apps
-
-After Docker builds and pushes the new image, GitHub Actions automatically updates Azure Container Apps.
-
-Example:
-
-```yaml
-- name: Deploy to Container App
-  run: az containerapp update --name ${{ env.CONTAINER_APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --image ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }}
-```
-
-Breakdown:
-
-```text
-az containerapp update
-→ update an existing Container App
-
---name
-→ identify the Container App
-
---resource-group
-→ specify where the application exists
-
---image
-→ specify the newly built Docker image
-```
-
-Example resolved command:
-
-```bash
-az containerapp update \
-  --name fastapi-app \
-  --resource-group rg-fastapi-cicd \
-  --image sarathfastapiacr.azurecr.io/fastapi-app:32a166d9
-```
-
-Azure then creates a new Container App revision using that image.
-
----
-
-# 🔁 Complete Automated CI/CD Flow
-
-```text
-Developer
-    ↓
-git push
-    ↓
-GitHub Repository
-    ↓
-GitHub Actions CI
-    ↓
-Run automated tests
-    ↓
-Docker build verification
-    ↓
-CI succeeds
-    ↓
-GitHub Actions CD
-    ↓
-Authenticate to Azure using OIDC
-    ↓
-Build versioned Docker image
-    ↓
-Push Docker image to ACR
-    ↓
-az containerapp update
-    ↓
-Container Apps pulls new image
-    ↓
-New revision
-    ↓
-FastAPI application live
-```
-
-After the initial Azure infrastructure exists, future deployments require no manual Docker build, push, or Container App image update.
+- Traceability
+- Reproducibility
+- Deployment history
+- Debugging
+- Rollback capability
+- Source-to-deployment mapping
 
 ---
 
 # ☁️ Azure Runtime Architecture
 
-> Recommended fourth infographic.
-
-```markdown
 ![Azure Runtime Architecture](docs/images/azure-runtime-architecture.png)
-```
 
-Suggested diagram:
-
-```text
-Azure Resource Group
-rg-fastapi-cicd
-│
-├── Azure Container Registry
-│   │
-│   └── fastapi-app
-│       ├── v1
-│       ├── v2
-│       └── <git-commit-sha>
-│
-├── Container Apps Environment
-│   │
-│   └── fastapi-app
-│       │
-│       ├── Uvicorn
-│       ├── Port 8000
-│       └── Managed Identity
-│
-└── Log Analytics Workspace
-
-                 ↓
-
-              HTTPS
-
-                 ↓
-
-          FastAPI /docs
-```
-
----
-
-# 🏢 Azure Resources
-
-The project resources are organized inside:
+The Azure infrastructure is organized inside:
 
 ```text
 rg-fastapi-cicd
@@ -872,6 +628,7 @@ rg-fastapi-cicd
 │
 ├── Azure Container Registry
 │   └── sarathfastapiacr
+│       └── fastapi-app
 │
 ├── Container Apps Environment
 │
@@ -881,67 +638,113 @@ rg-fastapi-cicd
 └── Log Analytics Workspace
 ```
 
----
-
-# 🏗️ Infrastructure vs Deployment
-
-The initial Azure infrastructure is provisioned once.
-
-For this project, infrastructure was created manually to understand each Azure component.
+The runtime flow is:
 
 ```text
-Provisioning
-=
-Create infrastructure
+Azure Container Registry
+        ↓
+Managed Identity Image Pull
+        ↓
+Azure Container App
+        ↓
+Uvicorn :8000
+        ↓
+HTTPS Ingress
+        ↓
+User / API Client
+```
 
-Examples:
+Azure Container Apps provides:
+
+- Managed HTTPS
+- Container hosting
+- Autoscaling
+- Scale-to-zero
+- Revision management
+- Traffic management
+- Logging
+- Public application endpoint
+
+---
+
+# 🤖 Automated Deployment
+
+The final CD step updates the existing Container App to use the Docker image created from the successful Git commit.
+
+```yaml
+- name: Deploy to Container App
+  run: az containerapp update --name ${{ env.CONTAINER_APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --image ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }}
+```
+
+Conceptually:
+
+```text
+Git Commit
+     ↓
+Docker Image
+     ↓
 ACR
+     ↓
+az containerapp update
+     ↓
+New Container App Revision
+     ↓
+Production Traffic
+```
+
+After the Azure infrastructure has been created, future application releases no longer require manual Docker build, push, or Container App image updates.
+
+---
+
+# 🏗️ Infrastructure vs Application Deployment
+
+The project separates **infrastructure provisioning** from **application deployment**.
+
+Infrastructure was initially created manually to understand each Azure resource.
+
+Infrastructure includes:
+
+```text
+Azure Container Registry
 Container Apps Environment
 Container App
 Managed Identity
 RBAC
+Log Analytics
 ```
 
-Once infrastructure exists, application deployments are automated.
+Application deployment is automated through GitHub Actions:
 
 ```text
-Deployment
-=
-Release new application versions
-
-GitHub Actions
-→ Test
-→ Build
-→ Push
-→ Deploy
+Test
+ ↓
+Build
+ ↓
+Version
+ ↓
+Push
+ ↓
+Deploy
 ```
 
-In a larger production environment, initial infrastructure provisioning could also be automated using:
+In a larger production environment, infrastructure provisioning could also be automated using:
 
 - Terraform
 - Bicep
 - ARM templates
-- Infrastructure pipelines
-
-This project intentionally focused first on understanding the Azure resources before automating application deployment.
+- Dedicated infrastructure pipelines
 
 ---
 
 # 🧯 Troubleshooting and Lessons Learned
 
-This project included several real deployment issues that were investigated and resolved.
+Building the project involved troubleshooting several real cloud deployment issues.
 
-These troubleshooting steps were an important part of understanding cloud deployment.
+## Azure CLI MFA
 
----
+Azure CLI initially required explicit tenant authentication and MFA.
 
-## Azure CLI MFA Authentication
-
-Azure CLI initially required MFA and explicit tenant authentication.
-
-The correct Azure tenant and subscription were selected before accessing the Container Registry.
-
-Verification:
+The active subscription was verified using:
 
 ```bash
 az account show --output table
@@ -949,7 +752,7 @@ az account show --output table
 
 ---
 
-## GitHub OIDC Authentication Failure
+## GitHub OIDC Authentication
 
 Initial GitHub Actions error:
 
@@ -958,35 +761,17 @@ AADSTS70025:
 The client has no configured federated identity credentials
 ```
 
-Cause:
+The issue occurred because Microsoft Entra ID did not yet trust the GitHub repository.
 
-```text
-GitHub successfully generated an OIDC token
-but
-Microsoft Entra ID did not yet trust the repository.
-```
-
-Resolution:
-
-A Federated Identity Credential was added to the Microsoft Entra App Registration.
-
-```text
-GitHub Repository
-      ↓
-main branch
-      ↓
-Federated Credential
-      ↓
-Microsoft Entra ID
-```
+It was resolved by configuring a **Federated Identity Credential** on the Azure App Registration.
 
 ---
 
-## GitHub Azure Identity Permissions
+## Azure RBAC Permissions
 
-OIDC authentication succeeded, but the GitHub identity initially lacked sufficient access to Azure resources.
+After OIDC authentication succeeded, the GitHub identity still required permission to access Azure resources.
 
-Azure RBAC roles were added according to the operations required by the deployment pipeline.
+Azure RBAC roles were assigned based on the operations required by the deployment workflow.
 
 ---
 
@@ -994,7 +779,7 @@ Azure RBAC roles were added according to the operations required by the deployme
 
 The Azure Container Registry uses the newer repository permission model.
 
-Repository responsibilities were separated:
+Responsibilities were separated:
 
 ```text
 Repository Writer
@@ -1004,40 +789,34 @@ Repository Reader
 → Container App pulls images
 ```
 
-The ACR admin account remained disabled.
-
 ---
 
 ## Container App Image Pull Failure
 
-Container App deployment initially failed with:
+The deployment initially failed with:
 
 ```text
 UNAUTHORIZED: authentication required
 Action: pull
 ```
 
-Cause:
-
-```text
-Container App
-→ attempted to pull private image
-→ identity did not have correct ACR permission
-```
+The Container App was trying to retrieve a private ACR image without the required permission.
 
 Resolution:
 
-The Container App's System-Assigned Managed Identity was given:
-
 ```text
+Container App
+      ↓
+System-Assigned Managed Identity
+      ↓
 Container Registry Repository Reader
+      ↓
+ACR
 ```
-
-permission on ACR.
 
 ---
 
-## Docker / Uvicorn Startup Error
+## Uvicorn Startup Error
 
 Container logs showed:
 
@@ -1051,39 +830,35 @@ The Dockerfile originally contained:
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "8000"]
 ```
 
-The `--port` argument was missing.
-
-The command was corrected to:
+The missing `--port` argument was corrected:
 
 ```dockerfile
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-A new Docker image version was then built:
+A corrected Docker image was built and deployed as:
 
 ```text
 fastapi-app:v2
 ```
 
-and deployed successfully.
-
 ---
 
-## Container Apps Ingress Port
+## Container Apps Ingress
 
-The public quickstart container initially listened on:
+The temporary quickstart image listened on:
 
 ```text
 80
 ```
 
-The actual FastAPI container listens on:
+The FastAPI/Uvicorn container listens on:
 
 ```text
 8000
 ```
 
-Therefore Azure Container Apps ingress was updated to:
+Azure Container Apps ingress was therefore configured with:
 
 ```text
 Target Port: 8000
@@ -1093,172 +868,74 @@ Target Port: 8000
 
 ## Scale to Zero
 
-Azure Container Apps showed:
+Azure Container Apps can display:
 
 ```text
 Scaled to 0
 ```
 
-This was not an error.
+when there is no traffic.
 
-The application was configured to allow Azure Container Apps to scale down when idle and automatically start a replica when traffic arrives.
+This is expected behavior when minimum replicas are configured as zero.
+
+When a request arrives, Azure can automatically start a replica.
 
 ---
 
 # 📊 Deployment Evidence
 
-Recommended screenshots to include in this section.
+## GitHub Actions
 
----
+Successful CI/CD runs:
 
-## 1. GitHub Actions
-
-Show a successful CI/CD execution.
-
-```markdown
 ![GitHub Actions](docs/images/github-actions-success.png)
-```
 
-The screenshot should show:
-
-```text
-CI ✅
-CD ✅
-```
+This demonstrates that both CI validation and CD deployment complete successfully.
 
 ---
 
-## 2. Azure Container Registry
+## Azure Container Registry
 
-Show the `fastapi-app` repository with tags such as:
+Versioned Docker images stored in ACR:
+
+![Azure Container Registry](docs/images/acr-images.png)
+
+The repository contains manual tags such as:
 
 ```text
 v1
 v2
-<git-commit-sha>
 ```
 
-```markdown
-![Azure Container Registry](docs/images/acr-images.png)
-```
-
-This demonstrates both manual versioning and automated commit-based versioning.
+and automated Git SHA tags generated by the CD pipeline.
 
 ---
 
-## 3. Azure Container App
+## Azure Container App
 
-Show:
+Running Azure Container App:
 
-```text
-Status: Running
-Container App URL
-Latest revision
-```
-
-```markdown
 ![Azure Container App](docs/images/container-app-running.png)
+
+This confirms:
+
+```text
+Application: fastapi-app
+Status: Running
+Environment: Azure Container Apps
+Ingress: HTTPS
+Target Port: 8000
 ```
 
 ---
 
-## 4. FastAPI Swagger UI
+## FastAPI Swagger UI
 
-Show the publicly deployed Swagger interface:
+The deployed application exposes interactive Swagger documentation:
 
-```text
-/docs
-```
-
-```markdown
 ![FastAPI Swagger](docs/images/swagger-cloud.png)
-```
 
-This provides visible proof that the containerized API is running successfully in Azure.
-
----
-
-# 📸 Recommended Workflow Infographics
-
-The repository should prioritize diagrams that explain the automation rather than using many Azure Portal screenshots.
-
-Recommended diagrams:
-
-### 1. Automated CI/CD Pipeline
-
-```text
-Developer
-→ GitHub
-→ CI
-→ Pytest
-→ Docker
-→ CD
-→ ACR
-→ Container Apps
-→ API
-```
-
-Filename:
-
-```text
-docs/images/cicd-architecture.png
-```
-
----
-
-### 2. Secretless Authentication Architecture
-
-```text
-GitHub
-→ OIDC
-→ Microsoft Entra ID
-→ Azure
-
-Container App
-→ Managed Identity
-→ ACR
-```
-
-Filename:
-
-```text
-docs/images/security-architecture.png
-```
-
----
-
-### 3. Docker Image Lifecycle
-
-```text
-Git Commit
-→ Docker Image
-→ ACR
-→ Container App Revision
-```
-
-Filename:
-
-```text
-docs/images/image-lifecycle.png
-```
-
----
-
-### 4. Azure Runtime Architecture
-
-```text
-Resource Group
-├── ACR
-├── Container Apps Environment
-├── FastAPI Container App
-└── Log Analytics
-```
-
-Filename:
-
-```text
-docs/images/azure-runtime-architecture.png
-```
+The Swagger UI confirms that the Dockerized API is publicly running through Azure Container Apps.
 
 ---
 
@@ -1267,30 +944,37 @@ docs/images/azure-runtime-architecture.png
 This project demonstrates practical experience with:
 
 - REST API development
-- Automated software testing
+- Python
+- FastAPI
+- Automated testing
+- Pytest
 - Docker
-- Container registries
-- CI/CD
+- Git
+- GitHub
 - GitHub Actions
+- Continuous Integration
+- Continuous Deployment
 - Azure
-- OIDC authentication
+- Azure Container Registry
+- Azure Container Apps
 - Microsoft Entra ID
-- Federated identities
-- Managed identities
+- OpenID Connect
+- Federated Identity Credentials
+- Managed Identity
 - Azure RBAC
 - Secure container deployment
-- Container versioning
-- Git SHA image tagging
-- Cloud application deployment
+- Git SHA-based versioning
 - Container revisions
-- Logging and troubleshooting
+- Cloud networking
+- Logging
+- Troubleshooting
 - Production-style deployment workflows
 
 ---
 
 # ✅ Final Result
 
-The final system provides an automated path from source code to a running cloud application.
+The completed system provides an automated path from source code to a running cloud application.
 
 ```text
 Developer
@@ -1301,16 +985,18 @@ Automated Testing
     ↓
 Docker Build
     ↓
+Versioned Container Image
+    ↓
 Azure Container Registry
     ↓
 Azure Container Apps
     ↓
-Public HTTPS API
+Public HTTPS Endpoint
     ↓
-FastAPI Swagger
+FastAPI Swagger UI
 ```
 
-After the initial Azure infrastructure is created, new application versions can be automatically:
+After the initial Azure infrastructure is provisioned, future application changes can automatically be:
 
 ```text
 Tested
@@ -1326,34 +1012,33 @@ through GitHub Actions.
 
 # 🔮 Future Improvements
 
-Future improvements to this project can include:
+Potential extensions include:
 
 - Application Insights
 - Azure Monitor
-- Advanced Log Analytics
-- Automated health checks
-- Deployment verification
+- Advanced Log Analytics dashboards
+- Health checks
+- Automated deployment verification
 - Automatic rollback
 - Staging and production environments
 - Azure Key Vault
+- Infrastructure as Code
+- Terraform
+- Bicep
 - MLflow
 - Azure Machine Learning
 - Model monitoring
 - Model evaluation
 - Continuous Training
 - Model quality gates
-- Infrastructure as Code using Terraform
-- Infrastructure as Code using Bicep
 - Kubernetes
-- Azure Kubernetes Service (AKS)
+- Azure Kubernetes Service
 
 ---
 
 # 📚 What I Learned
 
-Through this project I gained hands-on experience building a complete application delivery workflow rather than only developing an API.
-
-The project covered the full lifecycle:
+This project provided hands-on experience with the complete application delivery lifecycle:
 
 ```text
 Code
@@ -1366,35 +1051,38 @@ Code
 → Troubleshoot
 ```
 
-A major focus was understanding how individual tools interact:
+It demonstrated how different engineering tools work together:
 
 ```text
 GitHub
-→ source control
+→ Source control
 
 Pytest
-→ quality validation
+→ Automated quality validation
 
 Docker
-→ application packaging
+→ Application packaging
 
 GitHub Actions
-→ automation
-
-Azure Container Registry
-→ container image storage
-
-Azure Container Apps
-→ container execution
+→ CI/CD automation
 
 OIDC
-→ secure deployment authentication
+→ Secure deployment authentication
+
+Azure Container Registry
+→ Private image storage
 
 Managed Identity
-→ secure runtime authentication
+→ Secure runtime authentication
+
+Azure Container Apps
+→ Cloud container execution
+
+Log Analytics
+→ Cloud logging and observability
 ```
 
-This project demonstrates how application development, DevOps, cloud infrastructure, security, and deployment automation come together in a real end-to-end workflow.
+The project demonstrates how **application development, DevOps, cloud infrastructure, identity, security, containerization, and deployment automation** can be combined into a complete end-to-end workflow.
 
 ---
 
@@ -1402,4 +1090,4 @@ This project demonstrates how application development, DevOps, cloud infrastruct
 
 **Sarath Kumar Komathukattil**
 
-AI/ML | Applied AI | MLOps | Cloud 
+AI/ML | Applied AI | MLOps | Cloud | Robotics
